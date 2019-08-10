@@ -1,6 +1,6 @@
 # doc-o-tron
 
-Documentation bot for [rapture](https://github.com/swarley/rapture)
+Documentation bot for [rapture](https://github.com/swarley/rapture).
 However, it can be used genericially for yard documented ruby projects.
 
 ### Getting Started
