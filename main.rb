@@ -57,8 +57,10 @@ client.on_message_create do |message|
   next unless DB[:allowed_channels].map(:id).include? message.channel_id
 
   args = message.content.split('>', 2)
-  if args[0] == 'doc' && args.count > 1
-    object = YARD::Registry.load_yardoc.resolve(P("Rapture"), args.last, true)
+  next unless args.count > 1
+
+  if args[0] == 'doc'
+    object = YARD::Registry.load_yardoc.resolve(P(ROOT_NAMESPACE), args.last.strip, true)
 
     if object
       path = format_path(object)
