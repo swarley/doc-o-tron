@@ -57,9 +57,7 @@ client.on_message_create do |message|
   next unless DB[:allowed_channels].map(:id).include? message.channel_id
 
   args = message.content.split('>', 2)
-  next unless args.count > 1
-
-  if args[0] == 'doc'
+  if args[0] == 'doc' && args[1]
     object = YARD::Registry.load_yardoc.resolve(P(ROOT_NAMESPACE), args.last.strip, true)
 
     if object
