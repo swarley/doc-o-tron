@@ -8,6 +8,9 @@ config = YAML.load_file('config.yml')
 TOKEN = config["token"]
 OWNER_ID = config["owner_id"].to_i
 GITHUB_PAGES_URL = config["docs_url"]
+LIB_DIR = config["lib"]["dir"]
+ROOT_NAMESPACE = config["lib"]["namespace"]
+
 YARD::Registry.load_yardoc
 
 DB = Sequel.connect("sqlite://doc-o-tron.db")
@@ -31,11 +34,22 @@ end
 
 client = Rapture::Client.new(TOKEN)
 
-# Allow
+# Allow/Deny/Update
 client.on_message_create do |message|
-  if message.content == "doc-o-tron>allow" && message.author.id == OWNER_ID
+  next unless message.author.id == OWNER_ID
+
+  case message.content
+  when "doc-o-tron>allow"
     DB[:allowed_channels].insert(message.channel_id)
     client.create_message(message.channel_id, content: "Success")
+  when  message.content == "doc-o-tron>deny"
+    DB[:allowed_channels].where(id: message.channel_id).delete
+    client.create_message(message.channel_id, content: "Success")
+  when "doc-o-tron>update"
+    client.create_message(message.channel_id, content: "Updating sources")
+    `git pull --recurse-submodules`
+    `bundle exec yard doc #{LIB_DIR}`
+    YARD::Registry.load_yardoc
   end
 end
 
