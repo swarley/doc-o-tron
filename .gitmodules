@@ -1,0 +1,3 @@
+[submodule "rapture"]
+	path = rapture
+	url = https://github.com/swarley/rapture

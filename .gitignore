@@ -1,0 +1,5 @@
+.yardoc
+*.db
+doc/
+config.yml
+*.swp
