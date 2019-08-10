@@ -15,9 +15,9 @@ YARD::Registry.load_yardoc
 
 DB = Sequel.connect("sqlite://doc-o-tron.db")
 
-DB.create_table :allowed_channels do
-  Integer :id
-end unless DB[:allowed_channels]
+DB.create_table? :allowed_channels do
+  String :id
+end
 
 def format_path(object)
   url_path = if object.type == :method
@@ -40,10 +40,10 @@ client.on_message_create do |message|
 
   case message.content
   when "doc-o-tron>allow"
-    DB[:allowed_channels].insert(message.channel_id)
+    DB[:allowed_channels].insert(message.channel_id.to_s)
     client.create_message(message.channel_id, content: "Success")
   when  message.content == "doc-o-tron>deny"
-    DB[:allowed_channels].where(id: message.channel_id).delete
+    DB[:allowed_channels].where(id: message.channel_id.to_s).delete
     client.create_message(message.channel_id, content: "Success")
   when "doc-o-tron>update"
     client.create_message(message.channel_id, content: "Updating sources")
@@ -54,7 +54,7 @@ client.on_message_create do |message|
 end
 
 client.on_message_create do |message|
-  next unless DB[:allowed_channels].map(:id).include? message.channel_id
+  next unless DB[:allowed_channels].map(:id).include? message.channel_id.to_s
 
   args = message.content.split('>', 2)
   if args[0] == 'doc' && args[1]
